@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx wrangler types:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx typescript:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(npm install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

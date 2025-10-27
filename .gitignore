@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Wrangler
+.wrangler/
+.dev.vars
+
+# Test files
+test-private.pem
+test-public.pem
+test-client.js
+
+# Generated types
+worker-configuration.d.ts
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

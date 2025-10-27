@@ -1,0 +1,18 @@
+{
+  "name": "cloudflare-auth-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker with public key authentication",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "wrangler": "^3.90.0",
+    "typescript": "^5.7.2"
+  }
+}
