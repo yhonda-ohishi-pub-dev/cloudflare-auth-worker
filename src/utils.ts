@@ -51,3 +51,22 @@ export function getAuthorizedClients(envVar: string): Record<string, string> {
     return {};
   }
 }
+
+/**
+ * 環境変数からsecretデータを抽出
+ * AUTHORIZED_CLIENTSとCHALLENGE_STORAGE以外の全ての変数を返す
+ */
+export function extractSecrets(env: Env): Record<string, string> {
+  const secrets: Record<string, string> = {};
+  const excludeKeys = ['AUTHORIZED_CLIENTS', 'CHALLENGE_STORAGE'];
+
+  // Envの各キーを取得して処理
+  Object.keys(env).forEach((key) => {
+    const value = env[key as keyof Env];
+    if (!excludeKeys.includes(key) && typeof value === 'string') {
+      secrets[key] = value;
+    }
+  });
+
+  return secrets;
+}

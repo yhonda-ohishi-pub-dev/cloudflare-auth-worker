@@ -6,6 +6,7 @@ import {
   jsonResponse,
   errorResponse,
   getAuthorizedClients,
+  extractSecrets,
 } from './utils';
 
 export { ChallengeStorage };
@@ -122,14 +123,12 @@ export default {
         // チャレンジを削除（使い捨て）
         await stub.fetch(`http://internal/delete/${clientId}`, { method: 'DELETE' });
 
-        // JWT生成
-        const token = await generateJWT(clientId, env.SECRET_DATA || 'default-secret');
+        // JWT生成（SECRET_DATAがあればそれを使用、なければデフォルト）
+        const jwtSecret = env.SECRET_DATA || 'default-secret';
+        const token = await generateJWT(clientId, jwtSecret);
 
-        // Secret変数を返す
-        const secretData = {
-          SECRET_DATA: env.SECRET_DATA || '',
-          API_KEY: env.API_KEY || '',
-        };
+        // 環境変数から全てのsecretを動的に抽出
+        const secretData = extractSecrets(env);
 
         console.log(`Authentication successful for client: ${clientId}`);
         return jsonResponse({
