@@ -5,8 +5,6 @@ compatibility_date = "2024-01-01"
 # 環境変数
 [vars]
 AUTHORIZED_CLIENTS = '{"testclient":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs3p20SBwWfP6vPrGnSpj\nNWkTQ7KSWZQZidMOSsdA8obY4MrbRKh0dMg4mLgiloGDOLLKzjqxQJU+rP2JyvLF\na5oCDe0Lm0YuSkKc63alE8g14fW79s61vcaRpCDjJ1PMxaTte2XMdPYmMfYPjUyT\np30p1XiUzCjIUNHeqJS8lHz7tmAB7ODPHGyvKttWMZqMVvmCyyZ48BIaqSDO1xUw\nW3oMYqM1J5cXw7I3Hr+Y3agPAUEI2QBBwShsThFY/wGL8f7021ZmcWfW/9CYRd9F\nDbSDamjuRx09VLncVVPMBevgMT4hZEkGkL5V8m5aLdNWkb4p6vuUlKeokxk/SSsm\nQQIDAQAB\n-----END PUBLIC KEY-----"}'
-SECRET_DATA = "test-secret-data"
-API_KEY = "test-api-key"
 
 # Durable Objects
 [[durable_objects.bindings]]
