@@ -68,8 +68,10 @@ export default {
           clientId?: string;
           challenge?: string;
           signature?: string;
+          repoUrl?: string;
+          grpcEndpoint?: string;
         }>();
-        const { clientId, challenge, signature } = body;
+        const { clientId, challenge, signature, repoUrl, grpcEndpoint } = body;
 
         if (!clientId || !challenge || !signature) {
           console.error('Missing fields in /verify request');
@@ -129,6 +131,33 @@ export default {
 
         // 環境変数から全てのsecretを動的に抽出
         const secretData = extractSecrets(env);
+
+        // GitHub Webhook Workerにrepo情報を更新（repo情報が提供されている場合）
+        if (repoUrl && grpcEndpoint) {
+          try {
+            const webhookPayload = { grpcEndpoint };
+
+            const webhookResponse = await env.WEBHOOK_WORKER.fetch(
+              `http://internal/repo/${encodeURIComponent(repoUrl)}`,
+              {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(webhookPayload),
+              }
+            );
+
+            if (!webhookResponse.ok) {
+              const errorText = await webhookResponse.text();
+              console.error(
+                `Failed to update webhook worker for repo ${repoUrl}: ${webhookResponse.status} ${errorText}`
+              );
+            } else {
+              console.log(`Successfully updated webhook worker for repo: ${repoUrl}`);
+            }
+          } catch (error) {
+            console.error(`Error calling webhook worker:`, error);
+          }
+        }
 
         console.log(`Authentication successful for client: ${clientId}`);
         return jsonResponse({
