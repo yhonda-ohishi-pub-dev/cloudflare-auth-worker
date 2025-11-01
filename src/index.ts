@@ -70,8 +70,9 @@ export default {
           signature?: string;
           repoUrl?: string;
           grpcEndpoint?: string;
+          includeRepoList?: boolean;
         }>();
-        const { clientId, challenge, signature, repoUrl, grpcEndpoint } = body;
+        const { clientId, challenge, signature, repoUrl, grpcEndpoint, includeRepoList } = body;
 
         if (!clientId || !challenge || !signature) {
           console.error('Missing fields in /verify request');
@@ -159,11 +160,32 @@ export default {
           }
         }
 
+        // repoUrlリストを取得（オプション）
+        let repoList: string[] | undefined;
+        if (includeRepoList) {
+          try {
+            const repoListResponse = await env.WEBHOOK_WORKER.fetch('http://internal/repos', {
+              method: 'GET',
+            });
+
+            if (repoListResponse.ok) {
+              const data = await repoListResponse.json<{ repos: string[] }>();
+              repoList = data.repos;
+              console.log(`Retrieved ${repoList.length} repos from webhook worker`);
+            } else {
+              console.error(`Failed to retrieve repo list: ${repoListResponse.status}`);
+            }
+          } catch (error) {
+            console.error(`Error retrieving repo list:`, error);
+          }
+        }
+
         console.log(`Authentication successful for client: ${clientId}`);
         return jsonResponse({
           success: true,
           token,
           secretData,
+          ...(repoList && { repoList }),
         });
       }
 
