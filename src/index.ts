@@ -142,7 +142,10 @@ export default {
               `http://internal/repo/${encodeURIComponent(repoUrl)}`,
               {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Service-Binding': 'true',
+                },
                 body: JSON.stringify(webhookPayload),
               }
             );
@@ -166,6 +169,9 @@ export default {
           try {
             const repoListResponse = await env.WEBHOOK_WORKER.fetch('http://internal/repos', {
               method: 'GET',
+              headers: {
+                'X-Service-Binding': 'true',
+              },
             });
 
             if (repoListResponse.ok) {
