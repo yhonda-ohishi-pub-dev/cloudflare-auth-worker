@@ -169,9 +169,16 @@ export default {
             });
 
             if (repoListResponse.ok) {
-              const data = await repoListResponse.json<{ repos: string[] }>();
-              repoList = data.repos;
-              console.log(`Retrieved ${repoList.length} repos from webhook worker`);
+              const responseData = await repoListResponse.json<{
+                success: boolean;
+                data: Array<{ repo: string }>;
+                count: number;
+              }>();
+
+              if (responseData.success && responseData.data) {
+                repoList = responseData.data.map((item) => item.repo);
+                console.log(`Retrieved ${repoList.length} repos from webhook worker`);
+              }
             } else {
               console.error(`Failed to retrieve repo list: ${repoListResponse.status}`);
             }
