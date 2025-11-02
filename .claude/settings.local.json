@@ -5,7 +5,8 @@
       "Bash(npx tsc --noEmit)",
       "Bash(npx typescript:*)",
       "Bash(./node_modules/.bin/tsc:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(curl https://cloudflare-auth-worker.m-tama-ramu.workers.dev/tunnel/testclient)"
     ],
     "deny": [],
     "ask": []

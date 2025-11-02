@@ -15,9 +15,17 @@ AUTHORIZED_CLIENTS = '{"testclient":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhki
 name = "CHALLENGE_STORAGE"
 class_name = "ChallengeStorage"
 
+[[durable_objects.bindings]]
+name = "TUNNEL_STORAGE"
+class_name = "TunnelStorage"
+
 [[migrations]]
 tag = "v1"
 new_classes = ["ChallengeStorage"]
+
+[[migrations]]
+tag = "v2"
+new_classes = ["TunnelStorage"]
 
 # Service Bindings
 [[services]]
