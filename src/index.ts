@@ -230,7 +230,7 @@ export default {
         });
       }
 
-      // POST /tunnel/register - Tunnel URL登録（認証済みクライアント用）
+      // POST /tunnel/register - Tunnel URL登録（Go Backendから呼ばれる）
       if (path === '/tunnel/register' && request.method === 'POST') {
         const body = await request.json<{
           clientId?: string;
@@ -244,33 +244,60 @@ export default {
           return errorResponse('Bad request', 400);
         }
 
-        // TODO: JWTトークン検証を追加
-        // 現時点では簡易実装
-
-        // Durable Objectにトンネル情報を保存
+        // Durable ObjectからトンネルURLと保存済みトークンを取得して検証
         const id = env.TUNNEL_STORAGE.idFromName('global');
         const stub = env.TUNNEL_STORAGE.get(id);
-        const response = await stub.fetch('http://internal/store', {
+        const getResponse = await stub.fetch(`http://internal/get/${clientId}`);
+
+        if (!getResponse.ok) {
+          console.error(`No existing tunnel found for client: ${clientId}`);
+          return errorResponse('Authentication failed', 401);
+        }
+
+        const existingData = await getResponse.json<{
+          success: boolean;
+          data: { token: string };
+        }>();
+
+        // トークン検証
+        if (!existingData.success || existingData.data.token !== token) {
+          console.error(`Invalid token for client: ${clientId}`);
+          return errorResponse('Authentication failed', 401);
+        }
+
+        // トンネル情報を更新
+        const updateResponse = await stub.fetch('http://internal/store', {
           method: 'POST',
-          body: JSON.stringify({ clientId, tunnelUrl }),
+          body: JSON.stringify({ clientId, tunnelUrl, token }),
         });
 
-        if (!response.ok) {
-          console.error('Failed to store tunnel URL');
+        if (!updateResponse.ok) {
+          console.error('Failed to update tunnel URL');
           return errorResponse('Failed to register tunnel', 500);
         }
 
-        const result = await response.json();
-        console.log(`Tunnel URL registered for client: ${clientId}`);
+        const result = await updateResponse.json();
+        console.log(`Tunnel URL updated for client: ${clientId}`);
         return jsonResponse(result);
       }
 
-      // GET /tunnel/{clientId} - Tunnel URL取得（認証済みクライアント用）
+      // GET /tunnel/{clientId} - Tunnel URL取得（Service Bindingから呼ばれる）
       if (path.startsWith('/tunnel/') && request.method === 'GET') {
         const clientId = path.substring(8);
 
         if (!clientId) {
           return errorResponse('Bad request', 400);
+        }
+
+        // Service Bindingからのリクエストかチェック
+        const isServiceBindingRequest =
+          request.headers.get('X-Service-Binding') === 'true' ||
+          new URL(request.url).hostname === 'fake-host' ||
+          new URL(request.url).hostname.endsWith('.internal');
+
+        if (!isServiceBindingRequest) {
+          console.error('Unauthorized access to /tunnel/{clientId}');
+          return errorResponse('Unauthorized', 401);
         }
 
         // Durable Objectからトンネル情報を取得
