@@ -6,6 +6,7 @@
 export interface TunnelInfo {
   clientId: string;
   tunnelUrl: string;
+  token: string;
   updatedAt: number;
   createdAt: number;
 }
@@ -24,12 +25,12 @@ export class TunnelStorage {
     try {
       // PUT /store - Tunnel URL登録/更新
       if (path === '/store' && request.method === 'POST') {
-        const body = await request.json<{ clientId: string; tunnelUrl: string }>();
-        const { clientId, tunnelUrl } = body;
+        const body = await request.json<{ clientId: string; tunnelUrl: string; token: string }>();
+        const { clientId, tunnelUrl, token } = body;
 
-        if (!clientId || !tunnelUrl) {
+        if (!clientId || !tunnelUrl || !token) {
           return new Response(
-            JSON.stringify({ success: false, error: 'Missing clientId or tunnelUrl' }),
+            JSON.stringify({ success: false, error: 'Missing clientId, tunnelUrl, or token' }),
             { status: 400, headers: { 'Content-Type': 'application/json' } }
           );
         }
@@ -41,6 +42,7 @@ export class TunnelStorage {
         const tunnelInfo: TunnelInfo = {
           clientId,
           tunnelUrl,
+          token,
           updatedAt: now,
           createdAt: existing?.createdAt || now,
         };

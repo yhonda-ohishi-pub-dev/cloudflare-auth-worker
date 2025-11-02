@@ -3,6 +3,7 @@ import { TunnelStorage } from './tunnel-storage';
 import { importPublicKey, verifySignature, generateJWT } from './auth';
 import {
   generateChallenge,
+  generateToken,
   corsHeaders,
   jsonResponse,
   errorResponse,
@@ -166,6 +167,9 @@ export default {
           }
         }
 
+        // ランダムなトークンを生成
+        const accessToken = generateToken();
+
         // Tunnel URL登録（オプション）
         if (tunnelUrl) {
           try {
@@ -173,7 +177,7 @@ export default {
             const tunnelStub = env.TUNNEL_STORAGE.get(tunnelId);
             const tunnelResponse = await tunnelStub.fetch('http://internal/store', {
               method: 'POST',
-              body: JSON.stringify({ clientId, tunnelUrl }),
+              body: JSON.stringify({ clientId, tunnelUrl, token: accessToken }),
             });
 
             if (tunnelResponse.ok) {
@@ -220,6 +224,7 @@ export default {
         return jsonResponse({
           success: true,
           token,
+          accessToken,
           secretData,
           ...(repoList && { repoList }),
         });

@@ -10,6 +10,15 @@ export function generateChallenge(): string {
 }
 
 /**
+ * ランダムなトークン（32バイト）を生成
+ */
+export function generateToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes));
+}
+
+/**
  * CORS ヘッダーを追加
  */
 export function corsHeaders(): HeadersInit {
